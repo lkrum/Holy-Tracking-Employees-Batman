@@ -6,7 +6,7 @@
 // WHEN I choose to view all departments
   // sql code: SELECT * FROM departments
 // THEN I am presented with a formatted table showing department names and department ids
-  // 1 Sales 2 Technology 3 HR 4 Operations
+  //
 // WHEN I choose to view all roles
   // sql code: SELECT * FROM roles
 // THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
@@ -42,3 +42,54 @@
   // sql code: UPDATE employee.role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
   // sql code: SET employee.role = "`${role}`" WHERE id = `${id}`
+
+// required imports
+const inquirer = require('inquirer');
+const mysql = require('mysql2');
+
+// Connect to database
+const db = mysql.createConnection(
+  {
+    host: 'localhost',
+    user: 'root',
+    password: 'yee',
+    database: 'gotham_db'
+  },
+);
+
+
+// need functions for each prompt that user can take (e.g. add a role, add an employee, update employee name, delete employee)
+
+// view all departments
+function viewDepartment() {
+  db.query('SELECT * FROM department', function (err, results) {
+    console.log(results);
+  });
+}
+
+
+// add department name
+function department() {
+  db.query(`INSERT INTO department SET ?`, {name: "fish" } , function (err, results) {
+    if (err) {
+      throw err;
+    }
+    console.log(results);
+  });
+}
+
+// inquirer prompts
+// inquirer
+//   .prompt([
+//     {
+//       type: 'list',
+//       message: 'What would you like to do?',
+//       choices: ["add a department"],
+//       name: 'fish'
+//     },
+//   ])
+//   .then((data) => {
+//     console.log(data)
+//     if (data.name )
+//   }
+//   )
