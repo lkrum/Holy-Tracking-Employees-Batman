@@ -20,7 +20,7 @@
 
 // required imports
 const inquirer = require('inquirer');
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2');
 
 // Connect to mysql database
 const db = mysql.createConnection(
@@ -31,7 +31,7 @@ const db = mysql.createConnection(
     database: 'gotham_db'
   },
   console.log(`Connected to the gotham_db database 🦇.`)
-).promise();
+);
 
 
 // creating separate functions for each prompt that user can choose
@@ -39,6 +39,7 @@ const db = mysql.createConnection(
 function viewDepartments() {
   db.query('SELECT * FROM department', function (err, results) {
     console.table(results);
+    init();
   });
 }
 
@@ -85,21 +86,7 @@ function addDepartment() {
 }
 
 // function for adding a role
-function addRole(data) {
-  db.query(`
-  INSERT INTO role (
-  role.id, 
-  role.title, 
-  role.salary, 
-  department.name AS department
-  ) 
-  VALUES ?`, [data.role, data.salary, data.departmentType], function (err, results) {
-    if (err) {
-      throw err;
-    }
-    console.table(results);
-  });
-}
+
 
 // function for adding an employee
 
@@ -114,6 +101,7 @@ function addRole(data) {
 // }
 
 // inquirer prompts
+function init() {
 inquirer
   .prompt([
     {
@@ -144,10 +132,10 @@ inquirer
         viewEmployees();
         break;
       case 'add a department':
-         addDepartment();
+        addDepartment();
         break;
       case 'add a role':
-         addRole();
+        addRole();
         break;
       // case 'add an employee':
 
@@ -162,8 +150,9 @@ inquirer
 //     name: 'department'
 //   })
 
- addRole(data) {
-  const inquiry = await inquirer.prompt(
+function addRole() {
+  // add a query to get the department name from the id
+  inquirer.prompt([
     {
       type: 'input',
       message: 'What is the name of the role?',
@@ -179,5 +168,23 @@ inquirer
       message: 'Which department does the role belong to?',
       choices: ['Sales', 'Technology', 'HR', 'Operations'],
       name: 'departmentType'
+    }
+  ])
+    .then((data) => {
+      console.log(data);
+      db.query(`
+      INSERT INTO role 
+      (title, 
+      salary, 
+      department.name AS department) 
+      VALUES (?, ?, ?)`, [data.role, data.salary, data.departmentType], function (err, results) {
+        if (err) {
+          throw err;
+        }
+        console.table(results);
+      });
     })
 }
+}
+
+init();
