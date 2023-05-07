@@ -85,18 +85,33 @@ function addDepartment() {
 }
 
 // function for adding a role
-
-// function for adding an employee
-
-// function for updating an employee role
-function updateEmployeeRole() {
-  db.query(`UPDATE role SET ?`, { name: "fish" }, function (err, results) {
+function addRole(data) {
+  db.query(`
+  INSERT INTO role (
+  role.id, 
+  role.title, 
+  role.salary, 
+  department.name AS department
+  ) 
+  VALUES ?`, [data.role, data.salary, data.departmentType], function (err, results) {
     if (err) {
       throw err;
     }
     console.table(results);
   });
 }
+
+// function for adding an employee
+
+// function for updating an employee role
+// function updateEmployeeRole() {
+//   db.query(`UPDATE role SET ?`, {}, function (err, results) {
+//     if (err) {
+//       throw err;
+//     }
+//     console.table(results);
+//   });
+// }
 
 // inquirer prompts
 inquirer
@@ -129,25 +144,40 @@ inquirer
         viewEmployees();
         break;
       case 'add a department':
-       await addDepartment(),
+         addDepartment();
         break;
       case 'add a role':
+         addRole();
+        break;
+      // case 'add an employee':
 
-      case 'add an employee':
-
-      case 'update an employee role':
+      // case 'update an employee role':
     }
   });
 
-async addDepartment() {
-  const inquiry = await inquirer.prompt({
-    type: 'input',
-    message: 'What is the name of the department?',
-    name: 'department'
-  })
+// async addDepartment() {
+//   const inquiry = await inquirer.prompt({
+//     type: 'input',
+//     message: 'What is the name of the department?',
+//     name: 'department'
+//   })
 
-
-  
-
-
+ addRole(data) {
+  const inquiry = await inquirer.prompt(
+    {
+      type: 'input',
+      message: 'What is the name of the role?',
+      name: 'role'
+    },
+    {
+      type: 'input',
+      message: 'What is the salary of the role?',
+      name: 'salary'
+    },
+    {
+      type: 'list',
+      message: 'Which department does the role belong to?',
+      choices: ['Sales', 'Technology', 'HR', 'Operations'],
+      name: 'departmentType'
+    })
 }

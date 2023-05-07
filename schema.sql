@@ -33,12 +33,12 @@ CREATE TABLE employee (
 -- inserting table information
 USE gotham_db;
 
-INSERT INTO department (id, name)
+INSERT INTO department (name)
 VALUES
-    (1, "Sales"),
-    (2, "Technology"),
-    (3, "Operations"),
-    (4, "Operations");
+    ("Sales"),
+    ("Technology"),
+    ("HR"),
+    ("Operations");
 
 INSERT INTO role (id, title, salary, department_id)
 VALUES
