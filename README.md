@@ -25,6 +25,7 @@ OR
 - [Inquirer Package](https://www.npmjs.com/package/inquirer/v/8.2.4)
 - [mysql2 Package](https://www.npmjs.com/package/mysql2?activeTab=readme)
 - [W3Schools](https://www.w3schools.com/sql/sql_autoincrement.asp)
+- [Coding Insight](https://codingsight.com/how-to-create-table-with-multiple-foreign-keys-and-not-get-confused/#:~:text=You%20can%20use%20the%20FOREIGN,foreign%20key%20to%20reference%20it.) for how to format the foreign key
 - Bootcamp tutor Wesley Clements helped me add the auto increment keyword
 
 ## License
