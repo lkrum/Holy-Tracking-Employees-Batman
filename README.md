@@ -24,6 +24,8 @@ OR
 ## Credits 
 - [Inquirer Package](https://www.npmjs.com/package/inquirer/v/8.2.4)
 - [mysql2 Package](https://www.npmjs.com/package/mysql2?activeTab=readme)
+- [W3Schools](https://www.w3schools.com/sql/sql_autoincrement.asp)
+- Bootcamp tutor Wesley Clements helped me add the auto increment keyword
 
 ## License
 MIT License
