@@ -26,7 +26,8 @@ OR
 - [mysql2 Package](https://www.npmjs.com/package/mysql2?activeTab=readme)
 - [W3Schools](https://www.w3schools.com/sql/sql_autoincrement.asp)
 - [Coding Insight](https://codingsight.com/how-to-create-table-with-multiple-foreign-keys-and-not-get-confused/#:~:text=You%20can%20use%20the%20FOREIGN,foreign%20key%20to%20reference%20it.) for how to format the foreign key
-- (StackOverflow)(https://stackoverflow.com/questions/1435177/why-does-this-sql-code-give-error-1066-not-unique-table-alias-user) for how to reference an alias name
+- [StackOverflow](https://stackoverflow.com/questions/1435177/why-does-this-sql-code-give-error-1066-not-unique-table-alias-user) for how to reference an alias name
+- (W3Schools)(https://www.w3schools.com/js/js_switch.asp)
 - Bootcamp tutor Wesley Clements helped me add the auto increment keyword
 - Classmate Jessica Saddington helped me finalize my showEmployee function so I could get the full manager name
 
