@@ -65,17 +65,18 @@ function viewDepartments() {
   });
 }
 
-viewDepartments()
 // function for viewing all roles
 function viewRoles() {
-  db.query('SELECT * FROM role', function (err, results) {
+  db.query(`SELECT role.id, role.title, role.salary, department.name AS department FROM role INNER JOIN department ON role.department_id = department.id`, function (err, results) {
     console.table(results);
   });
 }
 
 // function for viewing all employees
 function viewEmployees() {
-  db.query('SELECT * FROM employee', function (err, results) {
+  db.query(`SELECT employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, manager_id AS manager FROM((employee
+INNER JOIN role ON employee.role_id = role.id)
+INNER JOIN department ON role.department_id = department.id);`, function (err, results) {
     console.table(results);
   });
 }
@@ -113,8 +114,16 @@ function updateEmployeeRole() {
 //     {
 //       type: 'list',
 //       message: 'What would you like to do?',
-//       choices: ['view all departments,' 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role'],
-//       name: 'fish'
+//       choices: [
+  //   'view all departments,'
+  //   'view all roles',
+  //   'view all employees',
+  //   'add a department',
+  //   'add a role',
+  //   'add an employee',
+  //   'update an employee role'
+  // ],
+//       name: 'input'
 //     },
 //   ])
 //   .then((data) => {
