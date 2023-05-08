@@ -1,19 +1,9 @@
-
-// WHEN I choose to view all departments
-// THEN I am presented with a formatted table showing department names and department ids
-// WHEN I choose to view all roles
-// THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
-// WHEN I choose to view all employees
-// THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
-// WHEN I choose to add a department
-// THEN I am prompted to enter the name of the department and that department is added to the database
 // WHEN I choose to add a role
 // THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
 // WHEN I choose to add an employee
 // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database
-// sql code: SET employee.role = "`${role}`" WHERE id = `${id}`
 
 // required imports
 const inquirer = require('inquirer');
@@ -69,12 +59,13 @@ function init() {
           addRole();
           break;
         case 'add an employee':
-          addEmploy()
+          addEmploy();
           break;
         case 'update an employee role':
+          updateEmployeeRole();
           break;
         case 'exit':
-
+          return;
       }
     });
 
@@ -97,6 +88,7 @@ function init() {
               FROM role 
               INNER JOIN department ON role.department_id = department.id`, function (err, results) {
       console.table(results);
+      init();
     });
   }
 
@@ -116,6 +108,7 @@ function init() {
             LEFT JOIN department ON role.department_id = department.id
             LEFT JOIN employee AS manager ON manager.id = employee.manager_id;`, function (err, results) {
       console.table(results);
+      init();
     });
   }
 
@@ -130,15 +123,16 @@ function init() {
     ])
       .then((data) => {
         console.log(data);
-        db.query(`INSERT INTO department SET ?`, {name: data.department}, function (err, results) {
+        db.query(`INSERT INTO department SET ?`, { name: data.department }, function (err, results) {
           if (err) {
             throw err;
           }
-          console.log(`${data.department} has been added`);
+          console.log(`${data.department} has been added to the database`);
+          init();
         });
       });
   }
-}
+
 
 // function for adding a role
 function addRole() {
@@ -172,11 +166,11 @@ function addRole() {
         if (err) {
           throw err;
         }
-        console.table(results);
+        console.log(`${data.role} has been added to the database`);
+        init();
       });
     })
 }
-
 
 // function for adding an employee
 function addEmploy() {
@@ -207,41 +201,53 @@ function addEmploy() {
     .then((data) => {
       console.log(data);
       db.query(`
+      INSERT INTO employee (first_name, last_name, role_id, manager_id)
+      VALUES (?, ?, ?, ?, ?, ?);
       SELECT employee.id, employee.first_name, employee.last_name, role.title, CONCAT(manager.first_name, ' ' , manager.last_name) AS manager
       FROM employee
       LEFT JOIN role ON employee.role_id = role.id
-      LEFT JOIN employee manager ON manager.id = employee.manager_id;
-      INSERT INTO employee (first_name, last_name, title, manager) VALUES (?, ?, ?, ?, ?, ?)`, [data.employeeFirst, data.employeeLast, data.roleName, data.managerName,], function (err, results) {
+      LEFT JOIN employee manager ON manager.id = employee.manager_id`, [data.employeeFirst, data.employeeLast, data.roleName, data.managerName,], function (err, results) {
         if (err) {
           throw err;
         }
-        console.table(results);
+        console.log(`${data.employeeFirst} + ${data.employeeLast} has been added to the database`);
+        init();
       });
     })
-
+  }
 
   // function for updating an employee role
-  // function updateEmployeeRole() {
-  //   db.query(`UPDATE role SET ?`, {}, function (err, results) {
-  //     if (err) {
-  //       throw err;
-  //     }
-  //     console.table(results);
-  //   });
-  // }
-  // async addDepartment() {
-  //   const inquiry = await inquirer.prompt({
-  //     type: 'input',
-  //     message: 'What is the name of the department?',
-  //     name: 'department'
-  //   })
-
-
-
-
-
-
-
+  function updateEmployeeRole() {
+    var viewEmploy = db.query(`SELECT first_name, last_name FROM employee`, {}, function (err, results));
+    inquirer.prompt([
+      {
+        type: 'list',
+        message: "Which employee's role do you want to update?",
+        choices: viewEmploy,
+        name: 'employNameUp'
+      },
+      {
+        type: 'input',
+        message: 'What is the salary of the role?',
+        name: 'salary'
+      },
+      {
+        type: 'list',
+        message: 'Which department does the role belong to?',
+        choices: ['Sales', 'Technology', 'HR', 'Operations'],
+        name: 'departmentType'
+      }
+    ])
+      .then((data) => {
+        console.log(data);
+        db.query(`UPDATE role SET ?`, {}, function (err, results) {
+          if (err) {
+            throw err;
+          }
+          console.log(`${data.role} has been added to the database`);
+        });
+      });
+    }
 }
 
 init();
