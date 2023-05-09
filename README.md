@@ -29,7 +29,7 @@ OR
 - [StackOverflow](https://stackoverflow.com/questions/1435177/why-does-this-sql-code-give-error-1066-not-unique-table-alias-user) for how to reference an alias name
 - (W3Schools)(https://www.w3schools.com/js/js_switch.asp)
 - Bootcamp tutor Wesley Clements helped me add the auto increment keyword
-- Classmate Jessica Saddington helped me finalize my showEmployee function so I could get the full manager name
+- Classmate Jessica Saddington helped me create the map method for getting the department list to input into the inquirer choices array
 
 ## License
 MIT License
