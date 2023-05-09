@@ -140,10 +140,9 @@ function init() {
       if (err) {
         throw err;
       };
-      // creating an array to store the department name to use in the inquirer prompt
+      // creating an array to store the department names to use in the inquirer prompt
       const departName = results.map((department) => department.name)
-      // alternative way to write this -- destructured statement
-      // const departName = results.map(({name}) => name)
+      
       inquirer.prompt([
         {
           type: 'input',
@@ -185,15 +184,19 @@ function init() {
       if (err) {
         throw err;
       };
+      // creating an array to store the role names to use in the inquirer prompt
+      const roleName = results.map((role) => role.title);
+      console.log(roleName)
       // creating a query to get the full list of manager names
       // Bootcamp tutor Patrick Lake helped me finalize this
       db.query(`SELECT first_name, last_name FROM employee WHERE manager_id IS NULL`, function (err, manResults) {
         if (err) {
           throw err;
         };
-        console.log(manResults)
-        // creating an array to store the roles so we can list them in the inquirer prompt
-        const roleName = results.map((roles) => roles.name)
+        // creating an array to store the manager names so we can list them in the inquirer prompt
+        // const separateName = manResults.forEach()
+        // const managerNames = manResults.first_name + " " + manResults.last_name;
+        // console.log(managerNames)
         // can use filter method for the manager
         // const managerName = results.filter(())
         // employee.firstname, employee.last name
@@ -214,7 +217,6 @@ function init() {
             choices: roleName,
             name: 'roleName'
           },
-
           {
             type: 'list',
             message: "Who is the employee's manager?",
