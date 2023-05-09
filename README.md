@@ -27,7 +27,9 @@ OR
 - [W3Schools](https://www.w3schools.com/sql/sql_autoincrement.asp)
 - [Coding Insight](https://codingsight.com/how-to-create-table-with-multiple-foreign-keys-and-not-get-confused/#:~:text=You%20can%20use%20the%20FOREIGN,foreign%20key%20to%20reference%20it.) for how to format the foreign key
 - [StackOverflow](https://stackoverflow.com/questions/1435177/why-does-this-sql-code-give-error-1066-not-unique-table-alias-user) for how to reference an alias name
-- (W3Schools)(https://www.w3schools.com/js/js_switch.asp)
+- [W3Schools](https://www.w3schools.com/js/js_switch.asp)
+- [W3Schools](https://www.w3schools.com/sql/sql_ref_is_null.asp)
+- [Mozilla](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
 - Bootcamp tutor Wesley Clements helped me add the auto increment keyword
 - Classmate Jessica Saddington helped me create the map method for getting the department list to input into the inquirer choices array
 

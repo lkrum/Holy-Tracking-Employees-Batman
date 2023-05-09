@@ -1,5 +1,3 @@
-// WHEN I choose to add a role
-// THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
 // WHEN I choose to add an employee
 // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
 // WHEN I choose to update an employee role
@@ -124,8 +122,7 @@ function init() {
     ])
       .then((data) => {
         console.log(data);
-        // Wesley Clements advised me to format the query using set and a 
-        db.query(`INSERT INTO department SET ?`, { name: data.department }, function (err, results) {
+        db.query(`INSERT INTO department SET name = ?`, [data.department], function (err, results) {
           if (err) {
             throw err;
           }
@@ -137,14 +134,16 @@ function init() {
 
   // function for adding a role
   function addRole() {
-    // Jessica Saddington helped me come up with the map method
+    // Jessica Saddington helped me come up with the map method and inserting data into the query
     // have to query the department table to get the list of department names 
     db.query(`SELECT name FROM department`, function (err, results) {
       if (err) {
         throw err;
       };
-    // creating an array to store the department name to use in the inquirer prompt
-      const departName = results.map((department) => `${department.name}`)
+      // creating an array to store the department name to use in the inquirer prompt
+      const departName = results.map((department) => department.name)
+      // alternative way to write this -- destructured statement
+      // const departName = results.map(({name}) => name)
       inquirer.prompt([
         {
           type: 'input',
@@ -165,9 +164,10 @@ function init() {
       ])
         .then((data) => {
           console.log(data);
-          db.query(`INSERT INTO role (title, salary, department_id)
-      SELECT ?, ?, department_id FROM department 
-      WHERE name = ?`, [data.role, data.salary, data.departmentType], function (err, results) {
+          db.query(`
+              INSERT INTO role (title, salary, department_id)
+              SELECT ?, ?, id 
+              FROM department WHERE name = ?`, [data.role, data.salary, data.departmentType], function (err, results) {
             if (err) {
               throw err;
             }
@@ -185,86 +185,90 @@ function init() {
       if (err) {
         throw err;
       };
-    });
-    // creating an array to store the roles so we can list them in the inquirer prompt
-    const roleName = results.map((roles) => `${roles.name}`)
+      // creating a query to get the full list of manager names
+      // Bootcamp tutor Patrick Lake helped me finalize this
+      db.query(`SELECT first_name, last_name FROM employee WHERE manager_id IS NULL`, function (err, manResults) {
+        if (err) {
+          throw err;
+        };
+        console.log(manResults)
+        // creating an array to store the roles so we can list them in the inquirer prompt
+        const roleName = results.map((roles) => roles.name)
+        // can use filter method for the manager
+        // const managerName = results.filter(())
+        // employee.firstname, employee.last name
+        inquirer.prompt([
+          {
+            type: 'input',
+            message: "What is the employes's first name?",
+            name: 'employeeFirst'
+          },
+          {
+            type: 'input',
+            message: "What is the employes's last name?",
+            name: 'employeeLast'
+          },
+          {
+            type: 'list',
+            message: "What is the employee's role?",
+            choices: roleName,
+            name: 'roleName'
+          },
 
+          {
+            type: 'list',
+            message: "Who is the employee's manager?",
+            choices: ["Dick Grayson"],
+            name: 'managerName'
+          }
+        ])
+          .then((data) => {
+            console.log(data);
+            // employee query
+            // db.query(` `, [data.employeeFirst, data.employeeLast, data.roleName, data.managerName,], function (err, results) {
+            //   if (err) {
+            //     throw err;
+            //   }
+            //   console.log(`${data.employeeFirst} + ${data.employeeLast} has been added to the database`);
+            //   init();
+            // });
+          });
+      });
+    });
+  }
+
+  // function for updating an employee role
+  function updateEmployeeRole() {
+    // var viewEmploy = db.query(`SELECT first_name, last_name FROM employee`, function (err, results));
     inquirer.prompt([
       {
-        type: 'input',
-        message: "What is the employes's first name?",
-        name: 'employeeFirst'
+        type: 'list',
+        message: "Which employee's role do you want to update?",
+        choices: viewEmploy,
+        name: 'employNameUp'
       },
       {
         type: 'input',
-        message: "What is the employes's last name?",
-        name: 'employeeLast'
+        message: 'What is the salary of the role?',
+        name: 'salary'
       },
       {
         type: 'list',
-        message: "What is the employee's role?",
-        choices: roleName,
-        name: 'roleName'
-      },
-
-      {
-        type: 'list',
-        message: "Who is the employee's manager?",
-        choices: ['Dick Grayson', 'Harley Quinn', 'Bruce Wayne', 'Alfred Pennyworth'],
-        name: 'managerName'
+        message: 'Which department does the role belong to?',
+        choices: ['Sales', 'Technology', 'HR', 'Operations'],
+        name: 'departmentType'
       }
     ])
       .then((data) => {
         console.log(data);
-        db.query(`
-      INSERT INTO employee (first_name, last_name, role_id, manager_id)
-      VALUES (?, ?, ?, ?, ?, ?);
-      SELECT employee.id, employee.first_name, employee.last_name, role.title, CONCAT(manager.first_name, ' ' , manager.last_name) AS manager
-      FROM employee
-      LEFT JOIN role ON employee.role_id = role.id
-      LEFT JOIN employee manager ON manager.id = employee.manager_id`, [data.employeeFirst, data.employeeLast, data.roleName, data.managerName,], function (err, results) {
+        db.query(`UPDATE role SET ?`, {}, function (err, results) {
           if (err) {
             throw err;
           }
-          console.log(`${data.employeeFirst} + ${data.employeeLast} has been added to the database`);
-          init();
+          console.log(`${data.role} has been added to the database`);
         });
       });
-  });
-}
-
-// function for updating an employee role
-function updateEmployeeRole() {
-  // var viewEmploy = db.query(`SELECT first_name, last_name FROM employee`, function (err, results));
-  inquirer.prompt([
-    {
-      type: 'list',
-      message: "Which employee's role do you want to update?",
-      choices: viewEmploy,
-      name: 'employNameUp'
-    },
-    {
-      type: 'input',
-      message: 'What is the salary of the role?',
-      name: 'salary'
-    },
-    {
-      type: 'list',
-      message: 'Which department does the role belong to?',
-      choices: ['Sales', 'Technology', 'HR', 'Operations'],
-      name: 'departmentType'
-    }
-  ])
-    .then((data) => {
-      console.log(data);
-      db.query(`UPDATE role SET ?`, {}, function (err, results) {
-        if (err) {
-          throw err;
-        }
-        console.log(`${data.role} has been added to the database`);
-      });
-    });
-}
+  }
 }
 
 init();
