@@ -142,7 +142,7 @@ function init() {
       };
       // creating an array to store the department names to use in the inquirer prompt
       const departName = results.map((department) => department.name)
-      
+
       inquirer.prompt([
         {
           type: 'input',
@@ -186,20 +186,19 @@ function init() {
       };
       // creating an array to store the role names to use in the inquirer prompt
       const roleName = results.map((role) => role.title);
-      console.log(roleName)
+
       // creating a query to get the full list of manager names
       // Bootcamp tutor Patrick Lake helped me finalize this
       db.query(`SELECT first_name, last_name FROM employee WHERE manager_id IS NULL`, function (err, manResults) {
         if (err) {
           throw err;
         };
+        console.log(manResults);
         // creating an array to store the manager names so we can list them in the inquirer prompt
-        // const separateName = manResults.forEach()
-        // const managerNames = manResults.first_name + " " + manResults.last_name;
-        // console.log(managerNames)
-        // can use filter method for the manager
-        // const managerName = results.filter(())
-        // employee.firstname, employee.last name
+        // Classmate Marquise West helped me write this map function
+        const managerName = manResults.map(({ first_name, last_name }) => `${first_name} ${last_name}`);
+        console.log(managerName);
+   
         inquirer.prompt([
           {
             type: 'input',
@@ -220,20 +219,21 @@ function init() {
           {
             type: 'list',
             message: "Who is the employee's manager?",
-            choices: ["Dick Grayson"],
+            choices: managerName,
             name: 'managerName'
           }
         ])
           .then((data) => {
             console.log(data);
-            // employee query
-            // db.query(` `, [data.employeeFirst, data.employeeLast, data.roleName, data.managerName,], function (err, results) {
-            //   if (err) {
-            //     throw err;
-            //   }
-            //   console.log(`${data.employeeFirst} + ${data.employeeLast} has been added to the database`);
-            //   init();
-            // });
+            db.query(` INSERT INTO employee (first_name, last_name, role_id, manager_id)
+              SELECT ?, ?, ?, ? 
+              FROM role WHERE role.title = department_id `, [data.employeeFirst, data.employeeLast, data.roleName, data.managerName,], function (err, results) {
+              if (err) {
+                throw err;
+              }
+              console.log(`${data.employeeFirst} + ${data.employeeLast} has been added to the database`);
+              init();
+            });
           });
       });
     });
