@@ -1,7 +1,5 @@
 // WHEN I choose to add an employee
 // THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
-// WHEN I choose to update an employee role
-// THEN I am prompted to select an employee to update and their new role and this information is updated in the database
 
 // required imports
 const inquirer = require('inquirer');
@@ -38,7 +36,7 @@ function init() {
         name: 'options'
       },
     ])
-    // Jessica Saddington inspired me to try a switch case for the first time instead of using an if statement
+    // switch case that initiates function based on user's choice selection
     .then((data) => {
       switch (data.options) {
         case 'view all departments':
@@ -115,7 +113,7 @@ function init() {
     inquirer.prompt([
       {
         type: 'input',
-        message: 'What is the name of the department?',
+        message: 'What is the name of the department you want to add?',
         name: 'department'
       },
     ])
@@ -125,7 +123,7 @@ function init() {
           if (err) {
             throw err;
           }
-          console.log(`${data.department} has been added to the database`);
+          console.log(`${data.department} has been added to the database.`);
           init();
         });
       });
@@ -145,17 +143,17 @@ function init() {
       inquirer.prompt([
         {
           type: 'input',
-          message: 'What is the name of the role?',
+          message: 'What is the name of the role you want to add?',
           name: 'role'
         },
         {
           type: 'input',
-          message: 'What is the salary of the role?',
+          message: 'What is the salary of this role?',
           name: 'salary'
         },
         {
           type: 'list',
-          message: 'Which department does the role belong to?',
+          message: 'Which department does this role belong to?',
           choices: departName,
           name: 'departmentType'
         }
@@ -169,7 +167,7 @@ function init() {
             if (err) {
               throw err;
             }
-            console.log(`${data.role} has been added to the database`);
+            console.log(`${data.role} has been added to the database.`);
             init();
           });
         });
@@ -192,7 +190,7 @@ function init() {
         if (err) {
           throw err;
         };
-        console.log(manResults);
+
         // creating an array to store the manager names so we can list them in the inquirer prompt
         // A classmate helped me format this map function correctly, but they didn't want their name in my project
         const managerName = manResults.map(({ first_name, last_name }) => `${first_name} ${last_name}`);
@@ -205,7 +203,7 @@ function init() {
           },
           {
             type: 'input',
-            message: "What is the employes's last name?",
+            message: "What is the employees's last name?",
             name: 'employeeLast'
           },
           {
@@ -223,18 +221,34 @@ function init() {
         ])
           .then((data) => {
             console.log(data);
-            // need to somehow convert the role name and manager name into their respective ids so this won't error out
-            db.query(`SELECT employee (first_name, last_name, role_id, manager_id)
-              VALUES (?, ?, ?, ?)`, [data.employeeFirst, data.employeeLast, data.roleName, data.managerName,], function (err, results) {
+            // have to get the role id so we can reference it in the employee table
+            db.query(`SELECT id FROM role WHERE title = '${data.roleName}'`, function (err, idResults) {
               if (err) {
                 throw err;
               }
-              console.log(`${data.employeeFirst} + ${data.employeeLast} has been added to the database`);
-              init();
+              const roleId = idResults.map((id) => id);
+              // have to split the role id or else it will input into the query as role_[number] and not just the number value
+              console.log(roleId);
+              // [{ id: 1 }]
+              // have to get the manager id so we can reference it in the employee table
+              db.query(`SELECT manager_id FROM employee WHERE role_id = ? AND first_name = '${data.employeeFirst}' AND last_name = '${data.employeeLast}'`, {roleId}  function (err, manIdResults) {
+                if (err) {
+                  throw err;
+                }
+                const managerId = manIdResults.map((manId) => manId)
+                db.query(`SELECT employee (id, first_name, last_name, role_id, manager_id)
+              VALUES (id, ?, ?, ?, ?)`, [data.employeeFirst, data.employeeLast, roleId, managerId], function (err, results) {
+                  if (err) {
+                    throw err;
+                  }
+                  console.log(`${data.employeeFirst} + ${data.employeeLast} has been added to the database.`);
+                  init();
+                });
+              });
             });
           });
       });
-    });
+    })
   }
 
   // function for updating an employee role
@@ -246,7 +260,6 @@ function init() {
       }
       // mapping results to store the full names in a new array to use in inquirer prompt
       const employName = employResults.map(({ first_name, last_name }) => `${first_name} ${last_name}`);
-
 
       // copying same role query as in the "add employee" query to get the full list of roles stored in a new array
       db.query(`SELECT title FROM role`, function (err, results) {
@@ -284,22 +297,22 @@ function init() {
               let firstName = updatedEmployName[0];
               let lastName = updatedEmployName[1];
 
-                  // updating employee table
-                  db.query(`
+              // updating employee table
+              db.query(`
             UPDATE employee 
             SET role_id = ${updatedTitle}
             WHERE first_name = '${firstName}' AND last_name = '${lastName}'`, function (err, results) {
-                    if (err) {
-                      throw err;
-                    }
+                if (err) {
+                  throw err;
+                }
 
-                    console.log(`The employee's role has been updated.`);
-                    init();
-                  });
+                console.log(`The employee's role has been updated.`);
+                init();
               });
             });
           });
       });
+    });
   };
 
 }
