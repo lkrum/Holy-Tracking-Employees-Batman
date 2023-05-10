@@ -105,7 +105,7 @@ function init() {
             LEFT JOIN role ON employee.role_id = role.id
             LEFT JOIN department ON role.department_id = department.id
             LEFT JOIN employee AS manager ON manager.id = employee.manager_id;`, function (err, results) {
-      console.log(results);
+      console.table(results);
       init();
     });
   }
@@ -246,8 +246,8 @@ function init() {
       }
       // mapping results to store the full names in a new array to use in inquirer prompt
       const employName = employResults.map(({ first_name, last_name }) => `${first_name} ${last_name}`);
-      
-      
+
+
       // copying same role query as in the "add employee" query to get the full list of roles stored in a new array
       db.query(`SELECT title FROM role`, function (err, results) {
         if (err) {
@@ -255,7 +255,7 @@ function init() {
         };
         // new array to store the role names to use in the inquirer prompt
         const roleName = results.map((role) => role.title);
-        
+
         inquirer.prompt([
           {
             type: 'list',
@@ -270,40 +270,38 @@ function init() {
             name: 'updatedRole'
           }
         ])
-        .then((data) => {
-          console.log(data);
-          // have to get the role id for the new employee table
-          db.query(`SELECT id FROM role WHERE title = '${data.updatedRole}'`, function (err, titleResults) {
-            if (err) {
-              throw err;
-            }
-            const updatedTitle = titleResults.map((role) => role.id);
-            
-            // splitting employee selection so we can grab the first and last name to use in the updated table
-            const updatedEmployName = data.employNameUp.split(" ");
-            let firstName = updatedEmployName[0];
-            let lastName = updatedEmployName[1];
-            
-            //need query for getting the employee id
-            db.query(`SELECT id FROM employee WHERE first_name = '${firstName}' AND last_name = '${lastName}'`) 
-            
-            // updating employee table
-            db.query(`
-            UPDATE employee 
-            SET first_name = '${firstName}', last_name ='${lastName}', role_id = '${updatedTitle}'
-            WHERE id = `,  function (err, results) {
+          .then((data) => {
+            console.log(data);
+            // have to get the role id for the new employee table
+            db.query(`SELECT id FROM role WHERE title = '${data.updatedRole}'`, function (err, titleResults) {
               if (err) {
                 throw err;
               }
-            
-              console.log(`The employee's role has been updated.`);
-              init();
+              const updatedTitle = titleResults.map((role) => role.id);
+
+              // splitting employee selection so we can grab the first and last name to use in the updated table
+              const updatedEmployName = data.employNameUp.split(" ");
+              let firstName = updatedEmployName[0];
+              let lastName = updatedEmployName[1];
+
+                  // updating employee table
+                  db.query(`
+            UPDATE employee 
+            SET role_id = ${updatedTitle}
+            WHERE first_name = '${firstName}' AND last_name = '${lastName}'`, function (err, results) {
+                    if (err) {
+                      throw err;
+                    }
+
+                    console.log(`The employee's role has been updated.`);
+                    init();
+                  });
+              });
             });
           });
-        });
       });
-    });
   };
+
 }
-  
+
 init();
