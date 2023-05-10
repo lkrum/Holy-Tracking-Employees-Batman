@@ -71,8 +71,7 @@ function init() {
   // function for viewing all departments
   function viewDepartments() {
     db.query('SELECT * FROM department', function (err, results) {
-      console.log(results);
-      // console.table(results);
+      console.table(results);
       init();
     });
   }
@@ -106,7 +105,7 @@ function init() {
             LEFT JOIN role ON employee.role_id = role.id
             LEFT JOIN department ON role.department_id = department.id
             LEFT JOIN employee AS manager ON manager.id = employee.manager_id;`, function (err, results) {
-      console.table(results);
+      console.log(results);
       init();
     });
   }
@@ -195,14 +194,13 @@ function init() {
         };
         console.log(manResults);
         // creating an array to store the manager names so we can list them in the inquirer prompt
-        // Classmate Marquise West helped me write this map function
+        // A classmate helped me format this map function correctly, but they didn't want their name in my project
         const managerName = manResults.map(({ first_name, last_name }) => `${first_name} ${last_name}`);
-        console.log(managerName);
-   
+
         inquirer.prompt([
           {
             type: 'input',
-            message: "What is the employes's first name?",
+            message: "What is the employees's first name?",
             name: 'employeeFirst'
           },
           {
@@ -225,9 +223,9 @@ function init() {
         ])
           .then((data) => {
             console.log(data);
-            db.query(` INSERT INTO employee (first_name, last_name, role_id, manager_id)
-              SELECT ?, ?, ?, ? 
-              FROM role WHERE role.title = department_id `, [data.employeeFirst, data.employeeLast, data.roleName, data.managerName,], function (err, results) {
+            // need to somehow convert the role name and manager name into their respective ids so this won't error out
+            db.query(`SELECT employee (first_name, last_name, role_id, manager_id)
+              VALUES (?, ?, ?, ?)`, [data.employeeFirst, data.employeeLast, data.roleName, data.managerName,], function (err, results) {
               if (err) {
                 throw err;
               }
@@ -241,36 +239,71 @@ function init() {
 
   // function for updating an employee role
   function updateEmployeeRole() {
-    // var viewEmploy = db.query(`SELECT first_name, last_name FROM employee`, function (err, results));
-    inquirer.prompt([
-      {
-        type: 'list',
-        message: "Which employee's role do you want to update?",
-        choices: viewEmploy,
-        name: 'employNameUp'
-      },
-      {
-        type: 'input',
-        message: 'What is the salary of the role?',
-        name: 'salary'
-      },
-      {
-        type: 'list',
-        message: 'Which department does the role belong to?',
-        choices: ['Sales', 'Technology', 'HR', 'Operations'],
-        name: 'departmentType'
+    // creating a query to get the full list of employees
+    db.query(`SELECT first_name, last_name FROM employee`, function (err, employResults) {
+      if (err) {
+        throw err;
       }
-    ])
-      .then((data) => {
-        console.log(data);
-        db.query(`UPDATE role SET ?`, {}, function (err, results) {
-          if (err) {
-            throw err;
+      // mapping results to store the full names in a new array to use in inquirer prompt
+      const employName = employResults.map(({ first_name, last_name }) => `${first_name} ${last_name}`);
+      
+      
+      // copying same role query as in the "add employee" query to get the full list of roles stored in a new array
+      db.query(`SELECT title FROM role`, function (err, results) {
+        if (err) {
+          throw err;
+        };
+        // new array to store the role names to use in the inquirer prompt
+        const roleName = results.map((role) => role.title);
+        
+        inquirer.prompt([
+          {
+            type: 'list',
+            message: "Which employee's role do you want to update?",
+            choices: employName,
+            name: 'employNameUp'
+          },
+          {
+            type: 'list',
+            message: 'Which role do you want to assign to the selected employee?',
+            choices: roleName,
+            name: 'updatedRole'
           }
-          console.log(`${data.role} has been added to the database`);
+        ])
+        .then((data) => {
+          console.log(data);
+          // have to get the role id for the new employee table
+          db.query(`SELECT id FROM role WHERE title = '${data.updatedRole}'`, function (err, titleResults) {
+            if (err) {
+              throw err;
+            }
+            const updatedTitle = titleResults.map((role) => role.id);
+            
+            // splitting employee selection so we can grab the first and last name to use in the updated table
+            const updatedEmployName = data.employNameUp.split(" ");
+            let firstName = updatedEmployName[0];
+            let lastName = updatedEmployName[1];
+            
+            //need query for getting the employee id
+            db.query(`SELECT id FROM employee WHERE first_name = '${firstName}' AND last_name = '${lastName}'`) 
+            
+            // updating employee table
+            db.query(`
+            UPDATE employee 
+            SET first_name = '${firstName}', last_name ='${lastName}', role_id = '${updatedTitle}'
+            WHERE id = `,  function (err, results) {
+              if (err) {
+                throw err;
+              }
+            
+              console.log(`The employee's role has been updated.`);
+              init();
+            });
+          });
         });
       });
-  }
+    });
+  };
 }
-
+  
 init();
