@@ -11,9 +11,9 @@ I have a habit leftover from previous schooling of trying do everything by mysel
 
 In the future, I would like to add a "delete" role, employee, or department functionality. I would also like to use the separation of concerns principle to organize my data into separate files for a cleaner interface. 
 
-Link to video demo: 
+Link to video demo: https://drive.google.com/file/d/16Bg39HdiqlPZpZat-BQbcplqBcPCeBZh/view?usp=sharing
 
-![Preview image]()
+![Preview image](./assets/demo.png)
 
 ## Installation
 1. Copy the SSH key in my GitHub repo and paste `git clone <SSHKEY>` in your terminal to create a local copy on your computer\

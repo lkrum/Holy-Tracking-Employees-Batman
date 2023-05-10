@@ -241,7 +241,7 @@ function init() {
                   if (err) {
                     throw err;
                   }
-                  console.log(`${data.employeeFirst} ${data.employeeLast} has been added to the database.Welcome to the Bat family!`);
+                  console.log(`${data.employeeFirst} ${data.employeeLast} has been added to the database. Welcome to the Bat family!`);
                   init();
                 });
               });
