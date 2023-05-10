@@ -58,6 +58,7 @@ function init() {
           updateEmployeeRole();
           break;
         case 'exit':
+          console.log("Justice never sleeps ...")
           return;
       }
     });
@@ -76,8 +77,8 @@ function init() {
     db.query(`
               SELECT role.id, 
               role.title, 
-              role.salary, 
-              department.name AS department 
+              department.name AS department, 
+              role.salary 
               FROM role 
               INNER JOIN department ON role.department_id = department.id`, function (err, results) {
       console.table(results);
@@ -158,8 +159,8 @@ function init() {
         .then((data) => {
           console.log(data);
           db.query(`
-              INSERT INTO role (title, salary, department_id)
-              SELECT ?, ?, id 
+              INSERT INTO role (title, department_id, salary)
+              SELECT ?, id, ? 
               FROM department WHERE name = ?`, [data.role, data.salary, data.departmentType], function (err, results) {
             if (err) {
               throw err;
@@ -240,7 +241,7 @@ function init() {
                   if (err) {
                     throw err;
                   }
-                  console.log(`${data.employeeFirst} ${data.employeeLast} has been added to the database.`);
+                  console.log(`${data.employeeFirst} ${data.employeeLast} has been added to the database.Welcome to the Bat family!`);
                   init();
                 });
               });
