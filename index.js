@@ -1,6 +1,3 @@
-// WHEN I choose to add an employee
-// THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
-
 // required imports
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
@@ -221,27 +218,29 @@ function init() {
         ])
           .then((data) => {
             console.log(data);
+            console.log(data.employeeLast)
             // have to get the role id so we can reference it in the employee table
             db.query(`SELECT id FROM role WHERE title = '${data.roleName}'`, function (err, idResults) {
               if (err) {
                 throw err;
               }
-              const roleId = idResults.map((id) => id);
-              // have to split the role id or else it will input into the query as role_[number] and not just the number value
-              console.log(roleId);
-              // [{ id: 1 }]
-              // have to get the manager id so we can reference it in the employee table
-              db.query(`SELECT manager_id FROM employee WHERE role_id = ? AND first_name = '${data.employeeFirst}' AND last_name = '${data.employeeLast}'`, {roleId}  function (err, manIdResults) {
+              const roleId = idResults.map((role) => role.id);
+
+              // have to get the employee id using the manager name (aka the manager_id) so we can reference it in the employee table
+              db.query(`SELECT id FROM employee WHERE first_name = '${data.managerName.split(" ")[0]}' AND last_name = '${data.managerName.split(" ")[1]}'`,  function (err, IdResults) {
                 if (err) {
                   throw err;
                 }
-                const managerId = manIdResults.map((manId) => manId)
-                db.query(`SELECT employee (id, first_name, last_name, role_id, manager_id)
-              VALUES (id, ?, ?, ?, ?)`, [data.employeeFirst, data.employeeLast, roleId, managerId], function (err, results) {
+                // mapping the results of the employee id to just get the number value
+                const employId = IdResults.map((emId) => emId.id)
+                
+                //inserting the new employee name, last name, role id, and manager id into the employee table 
+                db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id)
+              VALUES (?, ?, ?, ?)`, [data.employeeFirst, data.employeeLast, roleId, employId], function (err, results) {
                   if (err) {
                     throw err;
                   }
-                  console.log(`${data.employeeFirst} + ${data.employeeLast} has been added to the database.`);
+                  console.log(`${data.employeeFirst} ${data.employeeLast} has been added to the database.`);
                   init();
                 });
               });
