@@ -219,7 +219,6 @@ function init() {
         ])
           .then((data) => {
             console.log(data);
-            console.log(data.employeeLast)
             // have to get the role id so we can reference it in the employee table
             db.query(`SELECT id FROM role WHERE title = '${data.roleName}'`, function (err, idResults) {
               if (err) {
