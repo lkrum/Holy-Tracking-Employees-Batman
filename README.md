@@ -26,10 +26,9 @@ OR
 ## Usage
 1. Open the index.js file in your terminal\
 *Note: Make sure you have the starter code installed first!
-2. Run `
-3. Run `node index.js` to start the application 
-4. Type in answers to the questions and use the arrow keys to select answer options when applicable
-5. You can exit the inquirer prompt completely by running `^c` in your terminal 
+2. Run `node index.js` to start the application 
+3. Type in answers to the questions and use the arrow keys to select answer options when applicable
+4. You can exit the inquirer prompt completely by running `^c` in your terminal 
 
 ## Credits 
 - [Inquirer Package](https://www.npmjs.com/package/inquirer/v/8.2.4)
